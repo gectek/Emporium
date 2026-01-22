@@ -4,12 +4,16 @@ CMakeFiles/
 cmake_install.cmake
 Makefile
 CTestTestfile.cmake
-Chat_server/build/
+build/
 
 # Object files and Binaries
 x86_OS/*.o
 x86_OS/*.a
 x86_OS/*.so
 x86_OS/*.exe
+*.o
+*.a
+*.so
+*.exe
 #Neovim/ null -ls temp files
 .null-ls*
