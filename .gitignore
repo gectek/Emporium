@@ -11,3 +11,5 @@ build/
 *.a
 *.so
 *.exe
+#Neovim/ null -ls temp files
+.null-ls*
