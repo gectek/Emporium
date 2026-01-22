@@ -1,0 +1,13 @@
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+CTestTestfile.cmake
+build/
+
+# Object files and Binaries
+*.o
+*.a
+*.so
+*.exe
