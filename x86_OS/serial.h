@@ -1,6 +1,6 @@
 #ifndef SERIAL_H
 #define SERIAL_H
-
+#include "io.h"
 #define SERIAL_COM1_BASE                0x3F8
 
 #define SERIAL_DATA_PORT(base)          (base)
@@ -17,4 +17,5 @@ void serial_fifo_buffer_config(unsigned short com);
 void serial_modem_config(unsigned short com);
 int serial_is_transmit_fifo_empty(unsigned short com);
 void serial_write(unsigned short com,char *buf);
+void serial_init();
 #endif
