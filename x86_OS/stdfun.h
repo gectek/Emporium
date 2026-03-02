@@ -3,5 +3,7 @@
 #include "VGA_Text.h"
 char *int_to_string(int value, char *str,int base);
 void print(const char *format, ...);
-
+int str_len(const char *c);
+int str_cmp(const char *s1, const char *s2);
+void mem_mov(void *src, void *dest, int size);
 #endif

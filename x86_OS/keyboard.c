@@ -1,9 +1,5 @@
 #include "keyboard.h"
-#include "VGA_Text.h"
-#include "idt.h"
-#include "pic.h"
-#include "serial.h"
-#include "types.h"
+#include "shell.h"
 char keymaps[128] = {
     0,  27, '1', '2', '3', '4', '5', '6', '7', '8', /* 0x00 - 0x09 */
     '9', '0', '-', '=', '\b', /* 0x0A - 0x0E */
@@ -59,7 +55,6 @@ void keyboard_init()
     
     //Clearing the irq_mask 1
     IRQ_clear_mask(1);  
-    serial_write(SERIAL_COM1_BASE, "Keyboard Initialized...");
 }
 void keyboard_handler(registers_t regs)
 {
@@ -84,26 +79,12 @@ void keyboard_handler(registers_t regs)
     else if (shift_pressed == true) {
 
         uint8_t ASCII = shift_keymaps[scancode];//From the shift_array
-        key_print(ASCII);
+        cli_input_handler(ASCII);
     }
     else{
         ascii = keymaps[scancode];      //Normal state
-        key_print(ascii);
+        cli_input_handler(ascii);
     }
-}
-void key_print(uint8_t ascii)
-{
-    if(ascii == '\b')   //For  backspace
-    {
-        clear_char(); 
-    }
-    else if(ascii == '\n')  //For Enter
-    {
-        enter();
-    }
-    else {
-        terminal_putchar(ascii);    //Normal character
-    } 
 }
 
 

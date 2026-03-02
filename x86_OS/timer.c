@@ -1,8 +1,5 @@
 #include "timer.h"
-//#include "VGA_Text.h"
 #include "idt.h"
-#include "serial.h"
-#include "stdfun.h"
 
 int timer_ticks = 0;    //For keeping track of how many ticks the system  has been running
 
@@ -24,7 +21,6 @@ void timer_handler(registers_t regs)
 }
 void timer_install()
 {
-  serial_write(SERIAL_COM1_BASE, "Installing the timer handler...");  
   install_irq_handler(0, &timer_handler);  
 }
 void timer_delay(int ticks)

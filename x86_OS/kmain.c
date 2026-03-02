@@ -1,14 +1,15 @@
 //#include "io.h"
-//#include "VGA_Text.h"
 #include "serial.h"
 #include "gdt.h"
 #include "idt.h"
-#include "stdfun.h"
-
+#include "VGA_Text.h"
 void kmain(){
     gdt_init();
     serial_init();
-    terminal_init();
-    print("Hello World %d\n",3);
+    terminal_init(main_term);
     idt_init();
+    while(1)
+    {
+        __asm__("hlt");
+    }
 }

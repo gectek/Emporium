@@ -1,6 +1,5 @@
 #include "idt.h"
 #include "pic.h"
-#include "serial.h"
 #include "timer.h"
 #include "types.h"
 #include "keyboard.h"
@@ -24,7 +23,6 @@ void *irq_routines[16] =
 void install_irq_handler(int irq, void (*handler)(registers_t regs))
 {
     irq_routines[irq] = handler;
-    serial_write(SERIAL_COM1_BASE, "INSTALLATION COMPLETE....");
 }
 //uninstalling handler
 void uninstall_irq_handler(int irq)
@@ -41,13 +39,11 @@ void exception_handler(registers_t regs){
 void irq_handler(registers_t regs)
 {
     uint8_t vector_eff = regs.int_no - 32;
-    serial_write(SERIAL_COM1_BASE, "Entering the handler...");
     void (*handler)(registers_t regs); 
     handler = irq_routines[vector_eff];
 
     if(handler)
     {
-        serial_write(SERIAL_COM1_BASE, "Running the handler..");
         handler(regs);
     }
     //Send EOI while entering to the handler,only in the beginning, further researches needed
@@ -88,7 +84,6 @@ void idt_init(){
     }
     timer_install();
     IRQ_clear_mask(0);
-    serial_write(SERIAL_COM1_BASE, "Unmasked IRQ 0 ");
     keyboard_init();
     __asm__ volatile ("lidt %0" : : "m"(idtr));
     __asm__ volatile ("sti");

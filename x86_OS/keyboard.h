@@ -8,5 +8,4 @@
 void keyboard_init();
 void keyboard_handler(registers_t regs);
 void shift_state(uint8_t ASCII);
-void key_print(uint8_t ascii);
 #endif
