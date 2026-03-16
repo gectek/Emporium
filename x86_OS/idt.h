@@ -31,7 +31,7 @@ __attribute__((noreturn))
 void exception_handler(registers_t regs);           //Declaring the exception handler
 
 void irq_handler(registers_t regs);
-void idt_set_descriptor(uint8_t vector, void *isr, uint8_t flags);  //Function for setting an entry in idt
+void idt_set_descriptor(uint32_t vector, void *isr, uint8_t flags);  //Function for setting an entry in idt
 void idt_init(void);
 void install_irq_handler(int irq, void (*handler)(registers_t regs));
 void uninstall_irq_handler(int irq);

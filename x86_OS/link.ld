@@ -21,5 +21,6 @@ SECTIONS{
     {
         *(COMMON)           /*all common sections from all files*/
         *(.bss)             /*all uninitialized data from all files*/
+        endkernel = .;
     }
 }

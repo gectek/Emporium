@@ -2,8 +2,10 @@
 #define VGA_H
 #include "io.h"
 #include "types.h"
-#define VGA_WHITE        15
-#define VGA_BLACK        0
+#define VGA_WHITE 15
+#define VGA_BLACK 0
+#define VGA_RED 4
+#define VGA_BLUE 1
 #define VGA_WIDTH 80
 #define VGA_HEIGHT 25
 //cursor i/o ports

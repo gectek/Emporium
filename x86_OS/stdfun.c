@@ -1,6 +1,6 @@
 #include "stdfun.h"
 #include <stdarg.h>
-char *int_to_string(int value, char *str, int base)
+char *int_to_string(uint32_t value, char *str, int base)
 {
     char *rc;
     char *ptr;
@@ -34,6 +34,40 @@ char *int_to_string(int value, char *str, int base)
         *ptr-- = tmp;
     }
     return rc;      //rc points to the starting of the string
+}
+int ASCII_to_int(const char *str, int base)
+{
+    int result = 0;
+    if(base == 10)
+    {
+        for(int i = 0; i < str_len(str); i++)
+        {
+            result *= 10;
+            result += str[i] - '0';
+        }
+    }
+    else if(base == 16)
+    {
+        int i=0;
+        if(str[0] == '0' && (str[1] == 'x' || str[1] == 'X'))
+        {
+            i = 2;
+        }
+        for(;i<str_len(str);i++)
+        {
+            result = result << 4;
+            if(str[i] <= '9' && str[i] >= '0')
+            {
+                result += str[i] - '0';
+            }
+            else if(str[i] > '9')
+            {
+                result += (str[i] - 'a') + 10;
+            }
+        }
+
+    }
+    return result;
 }
 void print(const char *format, ...)
 {

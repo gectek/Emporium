@@ -120,3 +120,4 @@ void terminal_scroll(terminal_t *term) {
     term->row = VGA_HEIGHT - 1;
     term->column = 0;
 }
+
