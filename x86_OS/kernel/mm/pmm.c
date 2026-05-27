@@ -14,6 +14,7 @@ void pmm_init(multiboot_info_t *mbi)
     {
         PANIC("MEMORY MAP NOT GIVEN BY BOOTLOADER...!!");
     }
+    uintptr_t phys_kernel_end = (uintptr_t)&endkernel - 0xC0000000;
     memory_bitmap = &endkernel;
     multiboot_mmap_entry_t *folder =(multiboot_mmap_entry_t*)mbi->mmap_addr;
     uintptr_t folder_end = mbi->mmap_addr + mbi->mmap_length; 
@@ -63,8 +64,6 @@ void pmm_init(multiboot_info_t *mbi)
         print("\nStart: %x | Length: %x | Size: %d | Type: %d\n",(uint32_t)folder->base_addr,(uint32_t)folder->length,folder->size,folder->type);
     folder = (multiboot_mmap_entry_t*)((uintptr_t)folder + folder->size + 4);
     }*/
-    
-
 }
 void *kalloc_frame()
 {

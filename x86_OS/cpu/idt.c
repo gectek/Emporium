@@ -1,8 +1,10 @@
 #include "idt.h"
 #include "pic.h"
+#include "stdfun.h"
 #include "timer.h"
 #include "types.h"
 #include "keyboard.h"
+#include "paging.h"
 extern void *isr_stub_table[];
 extern void *irq_stub_table[];
 #define IDT_MAX_DESC 256
@@ -12,34 +14,44 @@ static idt_entry_t idt[IDT_MAX_DESC];
 
 static idtr_t idtr;
 
-//An array for status of irqs
-void *irq_routines[16] = 
-    {
-        0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0
-    };
+//An array for status of interrupts(exceptions and IRQs)
+void *interrupt_handlers[IDT_MAX_DESC] = {0};
 //A function for installing a handler
-void install_irq_handler(int irq, void (*handler)(registers_t regs))
+void install_int_handler(int intr, void (*handler)(registers_t regs))
 {
-    irq_routines[irq] = handler;
+    interrupt_handlers[intr] = handler;
 }
 //uninstalling handler
-void uninstall_irq_handler(int irq)
+void uninstall_int_handler(int intr)
 {
-    irq_routines[irq] = 0;
+    interrupt_handlers[intr] = 0;
 }
 
 
 
 void exception_handler(registers_t regs){
-     for(;;)
+    print("I am Here!! : %d\n", regs.int_no);
+    void (*handler)(registers_t regs);
+    if(interrupt_handlers[regs.int_no] != 0)
+    {
+        handler = interrupt_handlers[regs.int_no];
+
+        //Execute
+        handler(regs);
+    }
+    else {
+    
+    print("Unhandled Exception Occured: %d\n", regs.int_no);
+    for(;;)
      __asm__ volatile ("cli; hlt");
+    }
 }
 void irq_handler(registers_t regs)
 {
-    uint8_t vector_eff = regs.int_no - 32;
+    //print("Hardware Irq Fired: %d\n",regs.int_no);
+    //uint8_t vector_eff = regs.int_no - 32;
     void (*handler)(registers_t regs); 
-    handler = irq_routines[vector_eff];
+    handler = interrupt_handlers[regs.int_no];
 
     if(handler)
     {
@@ -81,9 +93,9 @@ void idt_init(){
         idt_set_descriptor(irq_vec, irq_stub_table[vector], 0x8E);
         vectors[irq_vec] = 1;
     }
-    timer_install();
-    IRQ_clear_mask(0);
+    timer_init();
     keyboard_init();
+    pagefault_init();
     __asm__ volatile ("lidt %0" : : "m"(idtr));
     __asm__ volatile ("sti");
 }

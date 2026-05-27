@@ -15,15 +15,15 @@ static commands_t command_table[] = {
     {"panic", "Manually trigger panic", &k_panic},
     {0,0,0}
 };
-static int cmd_count;
+static int cmd_count = 6;
 void shell_init()
 {
-    int i=0;
+   /* int i=0;
     while(command_table[i].command != 0)
     {
         cmd_count++;
         i++;
-    }
+    }*/
     command_buf[0] = 0;
     cmd_index = 0;
     print("\nGectOS>");

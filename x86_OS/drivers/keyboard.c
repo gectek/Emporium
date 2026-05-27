@@ -51,7 +51,7 @@ bool shift_pressed,ctrl_pressed;
 void keyboard_init()
 {
     //Installing the keyboard handler to the irq_routines table
-    install_irq_handler(1, &keyboard_handler); 
+    install_int_handler(33, &keyboard_handler); 
     
     //Clearing the irq_mask 1
     IRQ_clear_mask(1);  

@@ -22,7 +22,7 @@ void gdt_set_gate(uint32_t num, uint32_t base, uint32_t limit, uint8_t access, u
 void gdt_init(){
     //1) setup the gdt pointers
     gdt_ptr.limit = (sizeof(struct gdt_entry)*3) - 1;
-    gdt_ptr.base = (uint32_t)&gdt_descriptors;
+    gdt_ptr.base = (uintptr_t)&gdt_descriptors;
     //2) setup the entries:entry 0(Null descriptor)
     gdt_set_gate(0,0,0,0,0);
     //3) entry 1(code segment)
@@ -33,6 +33,6 @@ void gdt_init(){
     gdt_set_gate(2,0,0xFFFFFFFF,0x92,0xCF);
     
     //load the new gdt using the assembly code
-    gdt_flush((uint32_t)&gdt_ptr);
+    gdt_flush((uintptr_t)&gdt_ptr);
 }
 

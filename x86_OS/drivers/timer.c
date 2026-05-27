@@ -1,6 +1,7 @@
 #include "timer.h"
 #include "idt.h"
-
+#include "pic.h"
+#include "stdfun.h"
 int timer_ticks = 0;    //For keeping track of how many ticks the system  has been running
 
 void timer_phase(int hz)
@@ -16,12 +17,13 @@ void timer_handler(registers_t regs)
     timer_ticks++;
     if(timer_ticks % 18 == 0)       //Approximately one second
     {
-    //    print("Tick ");  
+        //print("Tick ");  
     }
 }
-void timer_install()
+void timer_init()
 {
-  install_irq_handler(0, &timer_handler);  
+  install_int_handler(32, &timer_handler);
+  IRQ_clear_mask(0);
 }
 void timer_delay(int ticks)
 {

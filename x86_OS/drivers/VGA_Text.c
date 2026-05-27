@@ -2,7 +2,7 @@
 #include "shell.h"
 #include "stdfun.h"
 // VGA_TEXT_MODE_BUFFER address
-uint16_t const *vgab = (uint16_t *)0x000B8000;
+uint16_t const *vgab = (uint16_t *)0xC00B8000;
 // function for writing to VGA_TEXT_MODE_BUFFER
 
 terminal_t *main_term;
