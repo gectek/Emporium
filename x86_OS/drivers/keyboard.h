@@ -5,7 +5,8 @@
 #include "pic.h"
 #include "idt.h"
 #include "serial.h"
+#define KB_BUFFER_SIZE 256
 void keyboard_init();
-void keyboard_handler(registers_t regs);
+registers_t* keyboard_handler(registers_t *regs);
 void shift_state(uint8_t ASCII);
 #endif

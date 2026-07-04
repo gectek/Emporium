@@ -12,8 +12,10 @@ isr_common_stub:
     mov es, ax
     mov fs, ax
     mov gs, ax
+    push esp
     ;4. Call C code
     call exception_handler
+    add esp, 4
     ;5. Restore Segment Registers
     pop eax     ;Reload the original data segment descriptor
     mov ds, ax
@@ -30,22 +32,26 @@ irq_common_stub:
     ;1) Save all General purpose registers
     pusha   ;pushes edi,esi,ebp,esp,ebx,edx,ecx,eax onto the stack
     ;2) Save segment registers
-    mov ax, ds  ;pushes ds->lower 16 bits of eax
-    push eax    ;save data segment register
+    mov cx, ds  ;pushes ds->lower 16 bits of eax
+    push ecx    ;save data segment register
     ;3) Load Kernel Data segment
-    mov ax, 0x10;load the  kernel data segment
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
+    mov cx, 0x10;load the  kernel data segment
+    mov ds, cx
+    mov es, cx
+    mov fs, cx
+    mov gs, cx
+    push esp
     ;4) Call C handler
     call irq_handler
+    add esp, 4
     ;5) restore Segment registers
-    pop eax
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
+    mov esp, eax
+    pop ecx
+    mov ds, cx
+    mov es, cx
+    mov fs, cx
+    mov gs, cx
+    ;the scheduler have returned 
     ;6) restore general purpose registers
     popa    ;pops GP regs
     ;7) Clean up the stack

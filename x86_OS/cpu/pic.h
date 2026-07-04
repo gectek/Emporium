@@ -36,4 +36,5 @@ void IRQ_clear_mask(uint8_t IRQLine);
 uint16_t pic_get_irr(void);
 uint16_t pic_get_isr(void);
 */
+void disable_lapic();
 #endif

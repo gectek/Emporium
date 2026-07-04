@@ -1,4 +1,5 @@
 #include "serial.h"
+#include "stdfun.h"
 void serial_configure_baud_rate(unsigned short com, unsigned short divisor)
 {
     outb(SERIAL_LINE_COMMAND_PORT(com), SERIAL_LINE_ENABLE_DLAB);
@@ -34,7 +35,6 @@ int serial_is_transmit_fifo_empty(unsigned short com)
 }
 void serial_write(unsigned short com,char *buf)
 {
-    //static int i=0;
     //loop through the string until null character comes
     while(*buf != '\0'){
         /*Busy waiting: wait till the fifo transmit buffer becomes empty*/

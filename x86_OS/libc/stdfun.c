@@ -1,5 +1,7 @@
 #include "stdfun.h"
 #include <stdarg.h>
+#include "serial.h"
+#include "debug.h"
 char *int_to_string(uint32_t value, char *str, int base)
 {
     char *rc;
@@ -69,8 +71,11 @@ int ASCII_to_int(const char *str, int base)
     }
     return result;
 }
+volatile int print_lock = 0;
 void print(const char *format, ...)
 {
+    while(print_lock);
+    print_lock = 1;
     va_list args;
     //creates a pointer to the list of arguments
     va_start(args, format);
@@ -85,12 +90,10 @@ void print(const char *format, ...)
         }
         format++;   //this part of the code runs only if the *format == '%'
                     //so, incrementing the format pointer to see what's coming next(d,x,s..)
-
         switch(*format){
             case 'd':{
                 //Decimal value
                 int d = va_arg(args, int);
-                
                 char buffer[32];
                 int_to_string(d,buffer,10);
                 print_string(main_term, buffer);
@@ -108,12 +111,11 @@ void print(const char *format, ...)
                 print_string(main_term, str);
                 break;
             }
-                        
         }
         format++;       //Going to the next character
     }
     va_end(args);       //End the list
-
+    print_lock = 0;
 }
 int str_len(const char *string)
 {
@@ -170,5 +172,17 @@ void mem_mov(void *src, void *dest, int size)
         }
     }
 }
+void mem_set(void *start_addr, char data, uint32_t len)
+{
+    uintptr_t *start = (uintptr_t*)start_addr;
+    for(int i=0; i< len; i++)
+    {
+        *(start+i) = data;
+    }
+}
+
+
+
+
 
 

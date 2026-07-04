@@ -16,12 +16,13 @@ void pmm_init(multiboot_info_t *mbi)
     }
     uintptr_t phys_kernel_end = (uintptr_t)&endkernel - 0xC0000000;
     memory_bitmap = &endkernel;
-    multiboot_mmap_entry_t *folder =(multiboot_mmap_entry_t*)mbi->mmap_addr;
-    uintptr_t folder_end = mbi->mmap_addr + mbi->mmap_length; 
+    multiboot_mmap_entry_t *folder =(multiboot_mmap_entry_t*)(mbi->mmap_addr+0xC0000000);
+    uintptr_t folder_end = mbi->mmap_addr + 0xC0000000 + mbi->mmap_length; 
     
     highest_addr = 0xFFFFFFFF;
     total_blocks = (highest_addr)/0x1000 + 1;
-
+    print("mmap_addr phys = %x\n", mbi->mmap_addr);
+print("mmap_addr virt = %x\n", mbi->mmap_addr + 0xC0000000);
     //2) Filling whole bitmap as USED
     
     for(uint32_t i =0; i < (total_blocks + 31)/32 ; i++)
@@ -29,7 +30,7 @@ void pmm_init(multiboot_info_t *mbi)
         memory_bitmap[i] = 0xFFFFFFFF;
     }
 
-    folder = (multiboot_mmap_entry_t*)mbi->mmap_addr; //resetting the folder to starting address of folders
+    folder = (multiboot_mmap_entry_t*)(mbi->mmap_addr+0xC0000000); //resetting the folder to starting address of folders
     
     //3) Now, we have to set all memory of type 1 to FREE
     while((uintptr_t)folder < folder_end)
@@ -44,7 +45,7 @@ void pmm_init(multiboot_info_t *mbi)
     //4) Next The kernel and bitmap addresses have to be marked as USED(Infact from 0 to 0x100000 and bitmap)
     uint32_t bitmap_length_bytes = (total_blocks+7)/8;
     uintptr_t kernel_start = 0x100000;
-    uintptr_t bitmap_start = (uintptr_t)&endkernel;
+    uintptr_t bitmap_start = phys_kernel_end;
     uintptr_t bitmap_end = bitmap_start + bitmap_length_bytes;
 
     //Lock the whole lower region
@@ -64,6 +65,7 @@ void pmm_init(multiboot_info_t *mbi)
         print("\nStart: %x | Length: %x | Size: %d | Type: %d\n",(uint32_t)folder->base_addr,(uint32_t)folder->length,folder->size,folder->type);
     folder = (multiboot_mmap_entry_t*)((uintptr_t)folder + folder->size + 4);
     }*/
+    print("PMM Init Successfully Completed...\n");
 }
 void *kalloc_frame()
 {
@@ -71,12 +73,12 @@ void *kalloc_frame()
     uint32_t start_address = 0x0;
     while(memory_bitmap[i] == 0xFFFFFFFF)
     {
-        i++;
-        if(i >= (total_blocks+31)/32)
+        if(i > (total_blocks+31)/32)
         {
-            print("No Available memory");
+            print("No Available memory\n%d\n",i);
             return NULL;
         }
+        i++;
     }
     for(;Bit<32;Bit++)
     {

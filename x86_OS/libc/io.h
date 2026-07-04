@@ -4,6 +4,9 @@
 static inline void outb(uint16_t port, uint8_t val);
 static inline unsigned char inb(uint16_t port);
 static inline void io_wait(void);
+static inline void cpu_rdmsr(uintptr_t msr, uintptr_t *hi, uintptr_t *lo);
+static inline void cpu_wrmsr(uintptr_t msr, uintptr_t hi, uintptr_t lo);
+
 static inline void outb(uint16_t port, uint8_t val){
     __asm__ volatile ("outb %b0, %w1" : :"a"(val), "Nd"(port) : "memory");
 }
@@ -17,5 +20,19 @@ static inline uint8_t inb(uint16_t port){
 }
 static inline void io_wait(){
     outb(0x80,0);
+}
+static inline void cpu_rdmsr(uintptr_t msr, uintptr_t *hi, uintptr_t *lo)
+{
+    __asm__ volatile( "rdmsr"       //asm instruction
+                    : "=a"(*lo), "=d"(*hi)      // outputs
+                    : "c"(msr)                 //inputs
+                    );
+}
+static inline void cpu_wrmsr(uintptr_t msr, uintptr_t hi, uintptr_t lo)
+{
+    __asm__ volatile( "wrmsr"                           //Instruction
+                    :                                   //No outputs
+                    : "c"(msr), "d"(hi), "a"(lo)        //Inputs
+                    );
 }
 #endif

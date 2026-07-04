@@ -7,4 +7,5 @@ void print(const char *format, ...);
 int str_len(const char *c);
 int str_cmp(const char *s1, const char *s2);
 void mem_mov(void *src, void *dest, int size);
+void mem_set(void *start, char data, uint32_t len);
 #endif

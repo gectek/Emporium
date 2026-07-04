@@ -23,7 +23,7 @@
 00000000000i[IMG   ]   vmware4 vbox vpc vvfat
 00000000000i[NETCTL] Networking modules
 00000000000i[NETCTL]   null vnet linux slirp socket tuntap vde
-00000000000i[MEM0  ] allocated memory at 0x7f30c1bdd010. after alignment, vector=0x7f30c1bde000, block_size = 128K
+00000000000i[MEM0  ] allocated memory at 0x7f0c39bdd010. after alignment, vector=0x7f0c39bde000, block_size = 128K
 00000000000i[MEM0  ] 32.00MB
 00000000000i[MEM0  ] mem block size = 0x00020000, blocks=256
 00000000000i[MEM0  ] rom at 0xfffe0000/131072 ('/usr/share/bochs/BIOS-bochs-latest')
@@ -35,7 +35,7 @@
 00000000000i[DEV   ] PIIX3 PCI-to-ISA bridge present at device 1, function 0
 00000000000i[PLUGIN] init_dev of 'cmos' plugin device by virtual method
 00000000000i[CMOS  ] Using local time for initial clock
-00000000000i[CMOS  ] Setting initial clock to: Wed May 27 22:12:33   2026 tz=utc (time0=1779919953)
+00000000000i[CMOS  ] Setting initial clock to: Wed Jul  1 20:47:04   2026 tz=utc (time0=1782938824)
 00000000000i[PLUGIN] init_dev of 'dma' plugin device by virtual method
 00000000000i[DMA   ] channel 4 used by cascade
 00000000000i[PLUGIN] init_dev of 'pic' plugin device by virtual method
@@ -68,7 +68,7 @@
 00000000000i[CD1   ] load cdrom with path='myos.iso'
 00000000000i[CD1   ] Opening image file as a cd.
 00000000000i[HD    ] Media present in CD-ROM drive
-00000000000i[HD    ] Capacity is 14643 sectors (28.60 MB)
+00000000000i[HD    ] Capacity is 14648 sectors (28.61 MB)
 00000000000i[PLUGIN] init_dev of 'pci_ide' plugin device by virtual method
 00000000000i[DEV   ] PIIX3 PCI IDE controller present at device 1, function 1
 00000000000i[PLUGIN] init_dev of 'unmapped' plugin device by virtual method
@@ -215,31 +215,31 @@
 00000538062i[BXVGA ] VBE known Display Interface b0c0
 00000538102i[BXVGA ] VBE known Display Interface b0c5
 00000539519i[VBIOS ] VBE Bios ID: vbe.c 2025-01-08
-00004254889i[BIOS  ] IDE time out
-00664357252i[BIOS  ] Booting from 07c0:0000
-00798285078i[SER   ] com1: FIFO enabled
-02709618000p[SDL2  ] >>PANIC<< POWER button turned off.
-02709618000i[CPU0  ] CPU is in protected mode (halted)
-02709618000i[CPU0  ] CS.mode = 32 bit
-02709618000i[CPU0  ] SS.mode = 32 bit
-02709618000i[CPU0  ] EFER = 0x00000000: ffxsr nxe lma lme sce
-02709618000i[CPU0  ] XCR0=0x00000001: tiledata tilecfg hwp lbr uintr hdc cet_s cet_u pasid pkru pt hi_zmm zmm_hi256 opmask bndcfg bndregs ymm sse FPU
-02709618000i[CPU0  ] | EAX=0000000e  EBX=00010000  ECX=00000001  EDX=c0101c96
-02709618000i[CPU0  ] | ESP=c0104fd4  EBP=c0104fec  ESI=00000000  EDI=00107000
-02709618000i[CPU0  ] | EFLAGS=00000282: id vip vif ac vm rf nt IOPL=0 of df IF tf SF zf af pf cf
-02709618000i[CPU0  ] | SEG sltr(index|ti|rpl)     base    limit G D
-02709618000i[CPU0  ] |  CS:0008( 0001| 0|  0) 00000000 ffffffff 1 1
-02709618000i[CPU0  ] |  DS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-02709618000i[CPU0  ] |  SS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-02709618000i[CPU0  ] |  ES:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-02709618000i[CPU0  ] |  FS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-02709618000i[CPU0  ] |  GS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-02709618000i[CPU0  ] | EIP=c01000e6 (c01000e6)
-02709618000i[CPU0  ] | CR0=0xe0000011: PG CD NW ac wp ne ET ts em mp PE
-02709618000i[CPU0  ] | CR2=0x00000000
-02709618000i[CPU0  ] | CR3=0x00105000
-02709618000i[CPU0  ] | CR4=0x00000000: lass uintr pks cet pke smap smep keylock osxsave pcid fsgsbase smx vmx la57 umip osxmmexcpt osfxsr pce pge mce pae pse de tsd pvi vme
-02709618000i[CPU0  ] 0x00000000c01000e6>> jmp .-3 (0xc01000e5) : EBFD
-02709618000i[CMOS  ] Last time: 1779922662 tz=utc (Wed May 27 22:57:42   2026)
-02709618000i[      ] restoring default signal behavior
-02709618000i[SIM   ] quit_sim called with exit code 1
+00004254912i[BIOS  ] IDE time out
+00698638055i[BIOS  ] Booting from 07c0:0000
+00834666506i[SER   ] com1: FIFO enabled
+07573309000p[SDL2  ] >>PANIC<< POWER button turned off.
+07573309000i[CPU0  ] CPU is in protected mode (halted)
+07573309000i[CPU0  ] CS.mode = 32 bit
+07573309000i[CPU0  ] SS.mode = 32 bit
+07573309000i[CPU0  ] EFER = 0x00000000: ffxsr nxe lma lme sce
+07573309000i[CPU0  ] XCR0=0x00000001: tiledata tilecfg hwp lbr uintr hdc cet_s cet_u pasid pkru pt hi_zmm zmm_hi256 opmask bndcfg bndregs ymm sse FPU
+07573309000i[CPU0  ] | EAX=00000097  EBX=00010000  ECX=c00b8000  EDX=00000097
+07573309000i[CPU0  ] | ESP=c0106fc4  EBP=c0106fec  ESI=00000000  EDI=00109000
+07573309000i[CPU0  ] | EFLAGS=00000246: id vip vif ac vm rf nt IOPL=0 of df IF tf sf ZF af PF cf
+07573309000i[CPU0  ] | SEG sltr(index|ti|rpl)     base    limit G D
+07573309000i[CPU0  ] |  CS:0008( 0001| 0|  0) 00000000 ffffffff 1 1
+07573309000i[CPU0  ] |  DS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+07573309000i[CPU0  ] |  SS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+07573309000i[CPU0  ] |  ES:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+07573309000i[CPU0  ] |  FS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+07573309000i[CPU0  ] |  GS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+07573309000i[CPU0  ] | EIP=c01001b6 (c01001b6)
+07573309000i[CPU0  ] | CR0=0xe0000011: PG CD NW ac wp ne ET ts em mp PE
+07573309000i[CPU0  ] | CR2=0x00000000
+07573309000i[CPU0  ] | CR3=0x00107000
+07573309000i[CPU0  ] | CR4=0x00000000: lass uintr pks cet pke smap smep keylock osxsave pcid fsgsbase smx vmx la57 umip osxmmexcpt osfxsr pce pge mce pae pse de tsd pvi vme
+07573309000i[CPU0  ] 0x00000000c01001b6>> jmp .-79 (0xc0100169) : EBB1
+07573309000i[CMOS  ] Last time: 1782946397 tz=utc (Wed Jul  1 22:53:17   2026)
+07573309000i[      ] restoring default signal behavior
+07573309000i[SIM   ] quit_sim called with exit code 1

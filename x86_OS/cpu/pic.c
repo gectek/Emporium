@@ -72,6 +72,18 @@ uint16_t pic_get_isr(){
     return __pic_get_irq_reg(PIC_READ_ISR);
 }
 */
-
+void disable_lapic()
+{
+    uintptr_t hi, lo;
+    uintptr_t APIC_BASE_MSR = 0x1B;
+    uintptr_t APIC_ENABLE_BIT = (1 << 11);
+    
+    //Read the current state of APIC in MSR
+    cpu_rdmsr(APIC_BASE_MSR, &hi, &lo);
+    //Clear the 11th bit of msr
+    lo &= ~(APIC_ENABLE_BIT);
+    //Rewrite the MSR with the new value
+    cpu_wrmsr(APIC_BASE_MSR, hi, lo);
+}
 
 

@@ -1,4 +1,5 @@
-global gdt_flush        ;allow the kmain to call this function
+global gdt_flush    ;allow the kmain to call this function
+global tss_flush
 gdt_flush:
     ;1) load the GDT
     mov eax, [esp+4]    ;moving the first argument(ie, struct gdt_ptr )
@@ -18,3 +19,8 @@ gdt_flush:
     jmp 0x08:.flush
 .flush:
     ret                 ;return to C code
+tss_flush:
+    mov ax, 0x18
+    ltr ax
+    ret
+    

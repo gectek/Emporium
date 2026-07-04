@@ -2,7 +2,9 @@
 #include "idt.h"
 #include "pic.h"
 #include "stdfun.h"
-int timer_ticks = 0;    //For keeping track of how many ticks the system  has been running
+#include "../kernel/MultiTasking/scheduler.h"
+#define TIME_SLICE 5
+uint32_t timer_ticks = 0;    //For keeping track of how many ticks the system  has been running
 
 void timer_phase(int hz)
 {
@@ -11,18 +13,19 @@ void timer_phase(int hz)
     outb(0x40, divisor & 0xFF);     //Sending the divisor to channel0
     outb(0x40, divisor >> 8);
 }
-void timer_handler(registers_t regs)
+registers_t* timer_handler(registers_t *regs)
 {
-    //increment the timer_ticks
     timer_ticks++;
-    if(timer_ticks % 18 == 0)       //Approximately one second
+    registers_t* new_esp = regs;
+    if(timer_ticks % TIME_SLICE == 0)
     {
-        //print("Tick ");  
+        new_esp = schedule(regs);
     }
+    return new_esp;
 }
 void timer_init()
 {
-  install_int_handler(32, &timer_handler);
+  install_int_handler(32, timer_handler);
   IRQ_clear_mask(0);
 }
 void timer_delay(int ticks)

@@ -1,12 +1,13 @@
 #include "VGA_Text.h"
 #include "shell.h"
 #include "stdfun.h"
+#include "serial.h"
 // VGA_TEXT_MODE_BUFFER address
 uint16_t const *vgab = (uint16_t *)0xC00B8000;
 // function for writing to VGA_TEXT_MODE_BUFFER
 
 terminal_t *main_term;
-
+extern volatile int print_lock;
 static inline uint16_t vga_entry(uint8_t ch, uint8_t color) {
   return (uint16_t)ch | (uint16_t)color << 8;
 }
@@ -27,7 +28,7 @@ int print_string(terminal_t *term, const char *string) {
 void terminal_clear() {
   for (int i = 0; i < VGA_HEIGHT; i++) {
     for (int j = 0; j < VGA_WIDTH; j++) {
-      const uint16_t index = i * VGA_WIDTH + j;
+      const uint32_t index = i * VGA_WIDTH + j;
       main_term->buffer[index] = vga_entry(' ', main_term->color);
     }
   }
@@ -103,6 +104,11 @@ void enter() {
   vga_move_cursor(index);
 }
 void terminal_scroll(terminal_t *term) {
+    if(print_lock == 0)
+    {
+        serial_write(SERIAL_COM1_BASE, "Bug: scroll called without lock\n");
+        for(;;);
+    }
     int i=0;
     //1) Move the rows up by one.
 

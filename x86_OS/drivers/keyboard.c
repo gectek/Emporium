@@ -1,5 +1,7 @@
 #include "keyboard.h"
-#include "shell.h"
+volatile char kb_buffer[KB_BUFFER_SIZE];
+volatile int kb_head = 0;
+volatile int kb_tail = 0;
 char keymaps[128] = {
     0,  27, '1', '2', '3', '4', '5', '6', '7', '8', /* 0x00 - 0x09 */
     '9', '0', '-', '=', '\b', /* 0x0A - 0x0E */
@@ -51,12 +53,12 @@ bool shift_pressed,ctrl_pressed;
 void keyboard_init()
 {
     //Installing the keyboard handler to the irq_routines table
-    install_int_handler(33, &keyboard_handler); 
+    install_int_handler(33, keyboard_handler); 
     
     //Clearing the irq_mask 1
     IRQ_clear_mask(1);  
 }
-void keyboard_handler(registers_t regs)
+registers_t *keyboard_handler(registers_t *regs)
 {
     uint8_t scancode;
     unsigned char ascii;
@@ -66,7 +68,7 @@ void keyboard_handler(registers_t regs)
     if(scancode == 0x2A || scancode == 0x36)
     {    
         shift_pressed = true;
-        return;             //For not affecting the Printing
+        return regs;             //For not affecting the Printing
     }
     if(scancode & 0x80)     //Checking if the MSB is set or not(For checking if any keys are released)
     {
@@ -79,12 +81,15 @@ void keyboard_handler(registers_t regs)
     else if (shift_pressed == true) {
 
         uint8_t ASCII = shift_keymaps[scancode];//From the shift_array
-        cli_input_handler(ASCII);
+        kb_buffer[kb_head] = ASCII;
+        kb_head = (kb_head + 1)% KB_BUFFER_SIZE;
     }
     else{
         ascii = keymaps[scancode];      //Normal state
-        cli_input_handler(ascii);
+        kb_buffer[kb_head] = ascii;
+        kb_head = (kb_head + 1)%KB_BUFFER_SIZE;
     }
+    return regs;
 }
 
 
