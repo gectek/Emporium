@@ -71,11 +71,8 @@ int ASCII_to_int(const char *str, int base)
     }
     return result;
 }
-volatile int print_lock = 0;
 void print(const char *format, ...)
 {
-    while(print_lock);
-    print_lock = 1;
     va_list args;
     //creates a pointer to the list of arguments
     va_start(args, format);
@@ -115,7 +112,6 @@ void print(const char *format, ...)
         format++;       //Going to the next character
     }
     va_end(args);       //End the list
-    print_lock = 0;
 }
 int str_len(const char *string)
 {

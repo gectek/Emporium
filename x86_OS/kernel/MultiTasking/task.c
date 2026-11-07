@@ -7,11 +7,13 @@
 #include "task.h"
 #include "../mm/heap.h"
 #include "../../libc/stdfun.h"
+#include "../../drivers/timer.h"
 uintptr_t next_pid = 1;
 extern pcb_t *current_task;
 extern pcb_t *task_list;
-
-
+pcb_t *zombie_head;
+pcb_t *current_zombie;
+pcb_t *sleep_queue_head = NULL;
 
 /// HAVE TO CHANGE THE PCB LIST TO DOUBLY LINKED LIST
 
@@ -24,7 +26,7 @@ pcb_t *create_task(void (*task_entry)(), uintptr_t pd_addr) {
     // 2. Allocate the 16KB Stack
     new_task->kernel_stack = (uintptr_t)k_malloc(16384);
     
-    // 3. Purge the Stack (The Fix for the 0x1C00 GPF)
+    // 3. Purge the Stack (The Fix for the 0x1C00 GPF(FILLING WITH ZEROES))
     uint8_t *stack_memory = (uint8_t *)new_task->kernel_stack;
     for (int i = 0; i < 16384; i++) {
         stack_memory[i] = 0;
@@ -36,11 +38,11 @@ pcb_t *create_task(void (*task_entry)(), uintptr_t pd_addr) {
 
     print("Kernel_stack : %x\n", new_task->kernel_stack);
 
-    // 4. Hang the Mold (The Fix for the 198 GPF Shift)
+    
     // Shift the pointer DOWN by the size of the struct so it fits perfectly inside the 16KB.
     new_task->regs = (registers_t*)(new_task->kernel_stack + 16384 - sizeof(registers_t));
 
-    // 5. Fill the Mold
+    // Initialize
 
     new_task->regs->cs = 0x08;
     new_task->regs->eip = (uint32_t)task_entry;
@@ -60,13 +62,13 @@ pcb_t *create_task(void (*task_entry)(), uintptr_t pd_addr) {
     new_task->regs->err_code = 0;
     new_task->regs->int_no = 0;
 
-    // Note: EDI, ESI, EBP, EBX, EDX, ECX, EAX are already 0 because of the purge loop!
+    // Note: EDI, ESI, EBP, EBX, EDX, ECX, EAX are already 0
 
     print("New task created : %d(PID)\n", new_task->PID);
     
     return new_task;
 }
-/*void task_exit()
+void task_exit()
 {
     __asm__ volatile("cli");
     pcb_t *prev = task_list;
@@ -83,7 +85,20 @@ pcb_t *create_task(void (*task_entry)(), uintptr_t pd_addr) {
     }
     prev->next = current_task->next;
     current_task->state = TASK_DEAD;
-
+    
+    //Zombie list
+    if(zombie_head == NULL)
+    {
+        zombie_head = current_task;
+        current_zombie = zombie_head;
+        zombie_head->next = zombie_head;
+    }
+    else {
+        current_zombie->next = current_task;
+        current_zombie = current_task;
+        current_zombie->next = zombie_head;
+    }
+    __asm__ volatile("int $0x20");
 exit:
     __asm__ volatile("sti");
     while(1)
@@ -91,5 +106,64 @@ exit:
         __asm__ volatile("hlt");
     }
 
-}*/
+}
+void task_reaper()
+{
+    while(1){
+        pcb_t *tmp = NULL;
+        if(zombie_head == NULL)
+        {
+            __asm__ volatile("int $0x20");
+            continue;   //When the task_reaper is called again, start from the top of while loop
+        }
+        else if(zombie_head->next == zombie_head)
+        {
+            tmp = zombie_head;
+            zombie_head = NULL;
+            current_zombie = NULL;
+        }
+        else {
+            tmp = zombie_head;
+            zombie_head = zombie_head->next;        //I was removing the tail of queue,but it is O(n) oprn.So,now removing from the head(O(1))
+            current_zombie->next = zombie_head;
+        }
+        k_free((void*)tmp->kernel_stack);
+        k_free((void*)tmp);
+        __asm__ volatile("int $0x20");
+    }
+}
+void task_sleep(uint32_t ms)
+{
+    __asm__ volatile("cli");
+    current_task->state = TASK_SLEEPING;
+    current_task->WAIT_TIME = ms + timer_ticks;     //The timer is ticking with frequency 1000 Hz(1 ms/tick)
+    
+    pcb_t *prev = task_list;
+    while(prev->next != current_task)
+    {
+        prev=prev->next;
+    }
+    if(current_task == task_list)
+    {
+        task_list = current_task->next;
+    }
+
+    prev->next = current_task->next;
+
+    if(sleep_queue_head == NULL){
+        sleep_queue_head = current_task;
+        current_task->next = NULL;
+    }
+    else{
+        current_task->next = sleep_queue_head;
+        sleep_queue_head = current_task;
+    }
+    
+     
+    
+     
+    
+}
+
+
 

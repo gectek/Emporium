@@ -5,7 +5,8 @@ typedef enum {
     TASK_CREATED,
     TASK_READY,
     TASK_RUNNING,
-    TASK_WAITING,
+    TASK_SLEEPING,
+    TASK_BLOCKED,
     TASK_DEAD
 }task_state_t;
 typedef struct pcb{
@@ -13,10 +14,12 @@ typedef struct pcb{
     struct pcb *next;
     uintptr_t pd_addr;
     uint32_t PID;
+    uint32_t WAIT_TIME;
     task_state_t state;
     uintptr_t kernel_stack;
 }pcb_t;
 pcb_t *create_task(void (*task_entry)(), uintptr_t pd_addr);
 void task_exit();
 void task_reaper();
+void task_sleep(uint32_t milliseconds);
 #endif  

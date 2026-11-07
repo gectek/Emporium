@@ -1,11 +1,10 @@
 #include "timer.h"
-#include "idt.h"
+#include "../cpu/idt.h"
 #include "pic.h"
 #include "stdfun.h"
 #include "../kernel/MultiTasking/scheduler.h"
-#define TIME_SLICE 5
-uint32_t timer_ticks = 0;    //For keeping track of how many ticks the system  has been running
-
+#define TIME_SLICE 20
+uint32_t timer_ticks = 0;
 void timer_phase(int hz)
 {
     int divisor = 1193180/hz;       //setting the divisor
@@ -20,11 +19,13 @@ registers_t* timer_handler(registers_t *regs)
     if(timer_ticks % TIME_SLICE == 0)
     {
         new_esp = schedule(regs);
+        print("TICK....");
     }
     return new_esp;
 }
 void timer_init()
 {
+  timer_phase(1000);
   install_int_handler(32, timer_handler);
   IRQ_clear_mask(0);
 }
