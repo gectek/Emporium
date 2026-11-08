@@ -1,5 +1,7 @@
 global isr_stub_table
 global irq_stub_table
+global isr129
+extern schedule
 isr_common_stub:
     ;1. Save all General purpose registers
     pusha       ;pushes edi,esi,ebp,esp,ebx,edx,ecx,eax onto stack
@@ -59,6 +61,39 @@ irq_common_stub:
     ;8) Return from interrupt
     iret;pops CS,EIP,EFLAGS,SS,ESP
 
+isr129:
+    cli
+    push byte 0
+    push byte 129
+    ;1) Save all General purpose registers
+    pusha   ;pushes edi,esi,ebp,esp,ebx,edx,ecx,eax onto the stack
+    ;2) Save segment registers
+    mov cx, ds  ;pushes ds->lower 16 bits of eax
+    push ecx    ;save data segment register
+    ;3) Load Kernel Data segment
+    mov cx, 0x10;load the  kernel data segment
+    mov ds, cx
+    mov es, cx
+    mov fs, cx
+    mov gs, cx
+    push esp
+    ;4) Call C handler
+    call schedule
+    add esp, 4
+    ;5) restore Segment registers
+    mov esp, eax
+    pop ecx
+    mov ds, cx
+    mov es, cx
+    mov fs, cx
+    mov gs, cx
+    ;the scheduler have returned 
+    ;6) restore general purpose registers
+    popa    ;pops GP regs
+    ;7) Clean up the stack
+    add esp, 8
+    ;8) Return from interrupt
+    iret;pops CS,EIP,EFLAGS,SS,ESP
 %macro isr_err_stub 1
 isr_stub_%+%1:
     cli             ;disabling all interrupts
@@ -132,7 +167,6 @@ IRQ     12, 44
 IRQ     13, 45
 IRQ     14, 46
 IRQ     15, 47
-
 
 isr_stub_table:
 %assign i 0

@@ -23,13 +23,12 @@ extern volatile char kb_buffer[];
 void task1() {
     while(1)
     {
-        print("TASK_1   ");
+        serial_write(SERIAL_COM1_BASE, "A             ");
     }
 }
 void task2() {
     while(1) {
-        print("TASK_2    ");
-        //serial_write(SERIAL_COM1_BASE,"TASK2 "); 
+        serial_write(SERIAL_COM1_BASE,"TASK2 "); 
     }
 }
 
@@ -64,8 +63,8 @@ void kmain(multiboot_info_t *phys_mbi_pointer, unsigned int magic){
     __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
     pcb_t *t1 = create_task(task1, cr3);
     pcb_t *t2 = create_task(task2, cr3);
-    //add_task(t1);
-    //add_task(t2);
+    add_task(t1);
+    add_task(t2);
     //add_task((void*)task_reaper);
 while(1) {
     if(kb_head != kb_tail)

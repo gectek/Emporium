@@ -8,9 +8,11 @@
 #include "../mm/heap.h"
 #include "../../libc/stdfun.h"
 #include "../../drivers/timer.h"
+#include "../../drivers/serial.h"
+#include "scheduler.h"
 uintptr_t next_pid = 1;
 extern pcb_t *current_task;
-extern pcb_t *task_list;
+extern pcb_t *task_queue_head;
 pcb_t *zombie_head;
 pcb_t *current_zombie;
 pcb_t *sleep_queue_head = NULL;
@@ -70,20 +72,14 @@ pcb_t *create_task(void (*task_entry)(), uintptr_t pd_addr) {
 }
 void task_exit()
 {
-    __asm__ volatile("cli");
-    pcb_t *prev = task_list;
-    while (prev->next != current_task) {
-        prev=prev->next;
-    }
-    if(task_list == current_task)
-        task_list = current_task->next;     //Setting the head of list to next one
-
-    if(task_list->next == task_list)
+    
+    if(current_task == idle_task || current_task->PID == 0)
     {
-        print("ERROR!!!, ONLY 1 TASK LEFT, CAN'T EXIT\n");
-        goto exit;
+        serial_write(SERIAL_COM1_BASE,"ERROR!!!, ONLY 1 TASK LEFT, CAN'T EXIT\n");
+        return;
     }
-    prev->next = current_task->next;
+    __asm__ volatile("cli"); //This was above the last task check, it was a bug
+
     current_task->state = TASK_DEAD;
     
     //Zombie list
@@ -91,65 +87,44 @@ void task_exit()
     {
         zombie_head = current_task;
         current_zombie = zombie_head;
-        zombie_head->next = zombie_head;
+        zombie_head->next = NULL;
     }
     else {
         current_zombie->next = current_task;
         current_zombie = current_task;
-        current_zombie->next = zombie_head;
+        current_zombie->next = NULL;
     }
-    __asm__ volatile("int $0x20");
-exit:
-    __asm__ volatile("sti");
-    while(1)
-    {
-        __asm__ volatile("hlt");
-    }
-
+    __asm__ volatile("int $0x81");
+    while(1) __asm__ volatile("hlt");
 }
 void task_reaper()
 {
     while(1){
-        pcb_t *tmp = NULL;
-        if(zombie_head == NULL)
+        uint32_t flags;
+        __asm__ volatile("pushf; pop %0; cli":"=r"(flags) :: "memory");
+        pcb_t *tmp = zombie_head;
+        if(tmp)
         {
-            __asm__ volatile("int $0x20");
-            continue;   //When the task_reaper is called again, start from the top of while loop
+            zombie_head = tmp->next;
+            if(!zombie_head) current_zombie = NULL;
         }
-        else if(zombie_head->next == zombie_head)
-        {
-            tmp = zombie_head;
-            zombie_head = NULL;
-            current_zombie = NULL;
-        }
-        else {
-            tmp = zombie_head;
-            zombie_head = zombie_head->next;        //I was removing the tail of queue,but it is O(n) oprn.So,now removing from the head(O(1))
-            current_zombie->next = zombie_head;
-        }
+        if(flags & 0x200) __asm__ volatile("sti" ::: "memory");
+        if(tmp){
         k_free((void*)tmp->kernel_stack);
         k_free((void*)tmp);
-        __asm__ volatile("int $0x20");
+        __asm__ volatile("int $0x81");
+        }
+        else {
+            task_sleep(10);
+        }
     }
 }
 void task_sleep(uint32_t ms)
-{
-    __asm__ volatile("cli");
+{   
+    uint32_t flags;
+    __asm__ volatile("pushf; pop %0; cli":"=r"(flags)::"memory");
     current_task->state = TASK_SLEEPING;
     current_task->WAIT_TIME = ms + timer_ticks;     //The timer is ticking with frequency 1000 Hz(1 ms/tick)
-    
-    pcb_t *prev = task_list;
-    while(prev->next != current_task)
-    {
-        prev=prev->next;
-    }
-    if(current_task == task_list)
-    {
-        task_list = current_task->next;
-    }
-
-    prev->next = current_task->next;
-
     if(sleep_queue_head == NULL){
         sleep_queue_head = current_task;
         current_task->next = NULL;
@@ -158,11 +133,8 @@ void task_sleep(uint32_t ms)
         current_task->next = sleep_queue_head;
         sleep_queue_head = current_task;
     }
-    
-     
-    
-     
-    
+    __asm__ volatile("int $0x81");
+    if(flags & 0x200)__asm__ volatile("sti");
 }
 
 

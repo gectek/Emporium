@@ -8,6 +8,7 @@
 #include "serial.h"
 extern void *isr_stub_table[];
 extern void *irq_stub_table[];
+extern void isr129();
 #define IDT_MAX_DESC 256
 static bool vectors[IDT_MAX_DESC];
 static idt_entry_t idt[IDT_MAX_DESC] __attribute__((aligned(0x10)));
@@ -108,6 +109,9 @@ void idt_init(){
         idt_set_descriptor(irq_vec, irq_stub_table[vector], 0x8E);
         vectors[irq_vec] = 1;
     }
+    idt_set_descriptor(129, (void *)isr129, 0x8E); //Software interrupt for triggering scheduler.
+    vectors[0x81] = 1;//Have to change the FLAG after ring 3 implementation.
+
     timer_init();
     keyboard_init();
     pagefault_init();

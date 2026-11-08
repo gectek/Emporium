@@ -19,7 +19,6 @@ registers_t* timer_handler(registers_t *regs)
     if(timer_ticks % TIME_SLICE == 0)
     {
         new_esp = schedule(regs);
-        print("TICK....");
     }
     return new_esp;
 }
